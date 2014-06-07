@@ -17,12 +17,17 @@ in a day, after all.)
 
 def evaluate(ast, env):
 	
-	if (not isinstance(ast, list)): return ast
-	
+	if is_atom(ast): 
+		if is_symbol(ast):
+			return env.lookup(ast)
+		return ast
+
+	if (ast[0] == "define"): return eval_define(ast, env)
 	if (ast[0] == "if"): return eval_if(ast, env)
+
 	if (ast[0] == "quote"): return ast[1]
-	elif (ast[0] == "atom"): return is_atom(ast,env)
-	elif (ast[0] == "eq"): return is_equal(ast,env)
+	elif (ast[0] == "atom"): return eval_atom(ast,env)
+	elif (ast[0] == "eq"): return eval_equal(ast,env)
 
 	elif (ast[0] == "+"): return do_addition(ast, env)
 	elif (ast[0] == "-"): return do_subtraction(ast, env)
@@ -31,17 +36,26 @@ def evaluate(ast, env):
 	elif (ast[0] == "mod"): return do_mod(ast, env)
 	elif (ast[0] == ">"): return do_greater(ast, env)
 
+def eval_define(ast, env):
+	if (len(ast) is not 3): 
+		raise LispError("Wrong number of arguments")
+	key = ast[1]
+	if not is_symbol(key):
+		raise LispError("First argument is a non-symbol")
+	value = evaluate(ast[2], env)
+	env.set(key, value)
+
 def eval_if(ast, env):
 	arg1 = evaluate(ast[1], env)
 	if (arg1):
 		return evaluate(ast[2], env)
 	else: return evaluate(ast[3], env)
 
-def is_atom(ast, env):
+def eval_atom(ast, env):
 	arg = evaluate(ast[1],env)
 	return not isinstance(arg, list)
 
-def is_equal(ast, env):
+def eval_equal(ast, env):
 	if (evaluate(["atom", ast[1]], env) and evaluate(["atom", ast[2]], env)):
 		return evaluate(ast[1], env) == evaluate(ast[2], env)
 	else: 
