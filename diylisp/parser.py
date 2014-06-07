@@ -9,13 +9,56 @@ This is the parser module, with the `parse` function which you'll implement as p
 the workshop. Its job is to convert strings into data structures that the evaluator can 
 understand. 
 """
-
-
 def parse(source):
-    """Parse string representation of one *single* expression
-    into the corresponding Abstract Syntax Tree."""
+    source = remove_comments(source)
+    source = remove_excess_whitespace(source)
+    source = expand_quote(source)
+    
+    e = is_bool(source)
+    if (e is None): e = is_array(source)
+    if (e is None): e = is_num(source)
+    if (e is None): e = is_symbol(source)
+    if (e is None): raise LispError("Unable to determine type")
 
-    raise NotImplementedError("DIY")
+    return e
+
+def remove_excess_whitespace(source):
+    return source.strip()
+
+def expand_quote(source):
+    if (source[0] == '\''):
+        return '(quote ' + source[1:] + ')'
+    else: return source
+
+def is_array(source):
+
+    if (source[0] == '('):
+
+        end = find_matching_paren(source)
+        if end != source.__len__()-1:
+            raise LispError("Expected EOF")
+
+        result = []
+        for e in split_exps(source[1:end]):
+            result.append(parse(e))
+        return result
+
+    return None
+
+def is_bool(source):
+    return {
+        '#t': True,
+        '#f': False,
+        }.get(source, None)
+
+def is_num(source):
+    try:
+        return int(source)
+    except ValueError:
+        return None
+
+def is_symbol(source):
+    return source
 
 ##
 ## Below are a few useful utility functions. These should come in handy when 
