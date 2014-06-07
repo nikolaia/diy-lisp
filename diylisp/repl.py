@@ -15,14 +15,14 @@ import readline
 
 def repl():
     """Start the interactive Read-Eval-Print-Loop"""
-    print()
+    print("")
     print("                 " + faded("                             \`.    T       "))
     print("    Welcome to   " + faded("   .--------------.___________) \   |    T  "))
     print("   the DIY-lisp  " + faded("   |//////////////|___________[ ]   !  T |  "))
     print("       REPL      " + faded("   `--------------'           ) (      | !  "))
     print("                 " + faded("                              '-'      !    "))
     print(faded("  use ^D to exit"))
-    print()
+    print("")
 
     env = Environment()
     interpret_file(join(dirname(relpath(__file__)), '..', 'stdlib.diy'), env)
@@ -64,7 +64,7 @@ def read_expression():
 def read_line(prompt):
     """Return touple of user input line and number of unclosed parens"""
 
-    line = input(colored(prompt, "grey", "bold"))
+    line = raw_input(colored(prompt, "grey", "bold"))
     line = remove_comments(line + "\n")
     return line, line.count("(") - line.count(")")
 
